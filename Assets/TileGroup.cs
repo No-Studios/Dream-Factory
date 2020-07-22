@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 public class TileGroup : MonoBehaviour
 {
     [SerializeField]
-    private CustomTile tile_to_place = null;
+    public TileBase tile_to_place = null;
     public GameObject temp_tile_to_place;
     
     [SerializeField]
@@ -18,10 +18,13 @@ public class TileGroup : MonoBehaviour
 
     private List<SerializedTile> all_tiles;
     private SerializedTile base_tile;
-    public float xOffset = .8f; 
+    public float xOffset = .8f;
+
+    public List<GameObject> child_tiles; 
     // Start is called before the first frame update
     void Start()
     {
+        child_tiles = new List<GameObject>(); 
         all_tiles = new List<SerializedTile>();
         base_tile = new SerializedTile();
         all_tiles.Add(base_tile);
@@ -57,19 +60,23 @@ public class TileGroup : MonoBehaviour
 
         foreach(SerializedTile s in all_tiles)
         {
+
+
             GameObject g = Instantiate(temp_tile_to_place);
+            g.AddComponent(typeof(FakeTile));
+            g.GetComponent<FakeTile>().x = s.x;
+            g.GetComponent<FakeTile>().y = s.y;
             float xPos = 0;
-            Debug.Log("x: " + s.x + " y: " + s.y);
-            if(Mathf.Abs(s.y % 2) == 1)
+            g.name = "x: " + s.x + " y: " + s.y;
+            xPos = s.x * .98f;
+            if (Mathf.Abs(s.y % 2) == 1)
             {
                 Debug.Log("yoyo");
-                xPos = s.x + xOffset;
+                xPos += xOffset;
             }
-            else
-            {
-                xPos = s.x;
-            }
-            g.transform.position = new Vector3(this.transform.position.x + xPos , this.transform.position.y + s.y * .8f, 0);
+
+            
+            g.transform.position = new Vector3(this.transform.position.x + xPos , this.transform.position.y + s.y * .85f, 0);
             g.transform.parent = this.gameObject.transform;
             //Debug.Log("x: " + s.x + " y: " + s.y);
             string h = "";
@@ -83,6 +90,7 @@ public class TileGroup : MonoBehaviour
                     h += m.ToString() + ", ";
                 }
             }
+            child_tiles.Add(g);
             //Debug.Log(h);
         }
         
@@ -129,33 +137,55 @@ public class TileGroup : MonoBehaviour
                     {
                         case 0:
                             indexToPlacePrevious = 3;
+
                             newY = y; 
                             newX = x - 1; 
                             break;
                         case 1:
                             indexToPlacePrevious = 4;
+                            newX = x - 1;
+                            if (Mathf.Abs(y % 2) == 1)
+                            {
+                                newX = x;
+
+                            }
                             newY = y - 1;
-                            newX = x; 
                             break;
                         case 2:
                             indexToPlacePrevious = 5;
-                            newX = x + 1;
+                            newX = x;
+                            if (Mathf.Abs(y % 2) == 1)
+                            {
+                                newX = x + 1;
+
+                            }
                             newY = y - 1; 
                             break;
                         case 3:
                             indexToPlacePrevious = 0;
                             newX = x + 1;
+
                             newY = y;
                             break;
                         case 4:
                             indexToPlacePrevious = 1;
                             newX = x;
+                            if (Mathf.Abs(y % 2) == 1)
+                            {
+                                newX = x + 1;
+
+                            }
                             newY = y + 1; 
                             break;
                         case 5:
                             indexToPlacePrevious = 2;
+                            newX = x - 1;
+                            if (Mathf.Abs(y % 2) == 1)
+                            {
+                                newX = x;
+
+                            }
                             newY = y + 1;
-                            newX = x - 1; 
                             break;
                     }
 
